@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 public class SaveProduct implements Serializable {
 
-    @NotBlank
+    @NotBlank(message = "El \"name\" debe tener contenido")
     private String name;
     @DecimalMin(value = "0.01")
     private BigDecimal price;
