@@ -2,6 +2,7 @@ package com.crisdev.api.springsecuritypractice.controller;
 
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationRequest;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationResponse;
+import com.crisdev.api.springsecuritypractice.persistence.entity.User;
 import com.crisdev.api.springsecuritypractice.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,14 @@ public class AuthenticationController {
     public ResponseEntity<Boolean> validate(@RequestParam String jwt){
         boolean isTokenValid = authenticationService.validateToken(jwt);
         return ResponseEntity.ok(isTokenValid);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<User> findMyProfile(){
+
+        User user = authenticationService.findLoggedInUser();
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/authenticate")
