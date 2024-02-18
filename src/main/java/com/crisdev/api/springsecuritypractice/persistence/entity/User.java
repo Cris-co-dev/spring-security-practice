@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,17 @@ public class User implements UserDetails {
 
         if (role.getPermissions() == null) return null;
 
-        return role.getPermissions().stream()
+        List<SimpleGrantedAuthority> authorities = role.getPermissions().stream()
                 .map(each -> {
                     String permission = each.name();
                     return new SimpleGrantedAuthority(permission);
                 })
                 .collect(Collectors.toList());
+
+        // Cuando se autoriza con roles, se añade esta linea de código. porque el método .hasRole llama despues a .hasAuthority y .hasAnyAuthority
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+
+        return authorities;
     }
 
     @Override
