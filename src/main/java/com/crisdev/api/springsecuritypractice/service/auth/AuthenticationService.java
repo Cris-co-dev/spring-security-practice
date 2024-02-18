@@ -4,11 +4,13 @@ import com.crisdev.api.springsecuritypractice.dto.RegisteredUser;
 import com.crisdev.api.springsecuritypractice.dto.SaveUser;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationRequest;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationResponse;
+import com.crisdev.api.springsecuritypractice.exception.ObjectNotFoundException;
 import com.crisdev.api.springsecuritypractice.persistence.entity.User;
 import com.crisdev.api.springsecuritypractice.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -75,9 +77,23 @@ public class AuthenticationService {
         try {
             jwtService.extractUsername(jwt);
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    public User findLoggedInUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof UsernamePasswordAuthenticationToken authToken) {// Parse en una sola linea
+            String username = (String) authToken.getPrincipal();
+            return userService.findOneByUsername(username).orElseThrow(() -> new ObjectNotFoundException("User not found. Username: " + username));
+        }
+
+        // Mala practica, pero queda de momento debido a que nunca
+        // se va a ejecutar porque solo tenemos una implementacion de autenticación.
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.crisdev.api.springsecuritypractice.config.security;
 
+import com.crisdev.api.springsecuritypractice.config.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 //Anotaciones siempre juntas cuando se hace este tipo de config.
 @Configuration
@@ -15,9 +17,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class HttpSecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public HttpSecurityConfig(AuthenticationProvider authenticationProvider) {
+    public HttpSecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.authenticationProvider = authenticationProvider;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -28,6 +32,9 @@ public class HttpSecurityConfig {
                 .sessionManagement(sessionManagmentConfig -> sessionManagmentConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))// config para que sea sin estado
                 .authenticationProvider(authenticationProvider)
+                // A los filtros personalizados se debe poner un orden entre 0 y +2000
+                // En este caso UsernamePasswordAuthenticationFilter tiene un peso de 1900.
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authReqConfig -> {
                     //Recursos Publicos
                     authReqConfig.requestMatchers(HttpMethod.POST, "/customers").permitAll();
