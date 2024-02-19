@@ -40,15 +40,14 @@ public class HttpSecurityConfig {
                 // A los filtros personalizados se debe poner un orden entre 0 y +2000
                 // En este caso UsernamePasswordAuthenticationFilter tiene un peso de 1900.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authReqConfig -> {
-               /*     authReqConfig.requestMatchers(HttpMethod.POST, "/customers").permitAll();
+                /*.authorizeHttpRequests(authReqConfig -> {
+                    authReqConfig.requestMatchers(HttpMethod.POST, "/customers").permitAll();
                     authReqConfig.requestMatchers(HttpMethod.POST, "/auth/authenticate").permitAll();
                     authReqConfig.requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll();
 
                     authReqConfig.anyRequest().authenticated();
-                */
                     //  buildRequestMatchersRoles(authReqConfig);
-                }).build();
+                }).*/.build();
     }
 
     private static void buildRequestMatchersAuthorities(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authReqConfig) {
