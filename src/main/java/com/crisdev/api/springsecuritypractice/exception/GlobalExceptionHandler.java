@@ -50,6 +50,9 @@ public class GlobalExceptionHandler {
 
     }
 
+    // La seguridad basada en métodos seguros (Ej: @PreAuthorize) no manjea exceptions de otro tipo
+    // como AuthenticationCredentialsNotFoundException httpstatus (401)
+    //Este exception handler es para cuando se opta por usar seguridad basada en métodos.
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handlerAccessDeniedException(AccessDeniedException e, HttpServletRequest httpServletRequest){
 

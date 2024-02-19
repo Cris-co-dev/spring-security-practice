@@ -1,6 +1,7 @@
 package com.crisdev.api.springsecuritypractice.config.security;
 
 import com.crisdev.api.springsecuritypractice.config.security.filter.JwtAuthenticationFilter;
+import com.crisdev.api.springsecuritypractice.config.security.handler.CustomAccessDeniedHandler;
 import com.crisdev.api.springsecuritypractice.persistence.util.Role;
 import com.crisdev.api.springsecuritypractice.persistence.util.RolePermission;
 import org.springframework.context.annotation.Bean;
@@ -12,21 +13,26 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 //Anotaciones siempre juntas cuando se hace este tipo de config.
 @Configuration
 @EnableWebSecurity // Activa y configura componentes
-@EnableMethodSecurity(prePostEnabled = true)
+//@EnableMethodSecurity(prePostEnabled = true)
 public class HttpSecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public HttpSecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public HttpSecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -40,14 +46,18 @@ public class HttpSecurityConfig {
                 // A los filtros personalizados se debe poner un orden entre 0 y +2000
                 // En este caso UsernamePasswordAuthenticationFilter tiene un peso de 1900.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                /*.authorizeHttpRequests(authReqConfig -> {
-                    authReqConfig.requestMatchers(HttpMethod.POST, "/customers").permitAll();
-                    authReqConfig.requestMatchers(HttpMethod.POST, "/auth/authenticate").permitAll();
-                    authReqConfig.requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll();
-
-                    authReqConfig.anyRequest().authenticated();
-                    //  buildRequestMatchersRoles(authReqConfig);
-                }).*/.build();
+                .authorizeHttpRequests(authReqConfig -> {
+                    buildRequestMatchersRoles(authReqConfig);
+                })
+                .exceptionHandling(exceptionConfig -> {
+                    //Ya que los componentes AuthenticationEntryPoint y AccessDeniedHandler se registran en
+                    // la cadena de filtros de seguridad (aca mismo) estos dos componentes no
+                    // pueden capturar excepciones de los interceptores de anotaciones.
+                    exceptionConfig.authenticationEntryPoint(this.authenticationEntryPoint);
+                    //Manejo de 403
+                    exceptionConfig.accessDeniedHandler(this.customAccessDeniedHandler);
+                })
+                .build();
     }
 
     private static void buildRequestMatchersAuthorities(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authReqConfig) {
