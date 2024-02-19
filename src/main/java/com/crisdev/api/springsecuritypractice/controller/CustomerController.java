@@ -6,6 +6,7 @@ import com.crisdev.api.springsecuritypractice.service.auth.AuthenticationService
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class CustomerController {
     }
 
     @PostMapping
+    @PreAuthorize("permitAll()")
     public ResponseEntity<RegisteredUser> registerOne(@RequestBody @Valid SaveUser newUser){
         RegisteredUser registeredUser = authenticationService.registerOneCustomer(newUser);
 

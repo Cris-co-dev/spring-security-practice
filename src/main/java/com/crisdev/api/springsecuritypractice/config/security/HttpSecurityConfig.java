@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 //Anotaciones siempre juntas cuando se hace este tipo de config.
 @Configuration
 @EnableWebSecurity // Activa y configura componentes
+@EnableMethodSecurity(prePostEnabled = true)
 public class HttpSecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
@@ -39,9 +41,13 @@ public class HttpSecurityConfig {
                 // En este caso UsernamePasswordAuthenticationFilter tiene un peso de 1900.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authReqConfig -> {
+               /*     authReqConfig.requestMatchers(HttpMethod.POST, "/customers").permitAll();
+                    authReqConfig.requestMatchers(HttpMethod.POST, "/auth/authenticate").permitAll();
+                    authReqConfig.requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll();
 
-                    buildRequestMatchersRoles(authReqConfig);
-
+                    authReqConfig.anyRequest().authenticated();
+                */
+                    //  buildRequestMatchersRoles(authReqConfig);
                 }).build();
     }
 

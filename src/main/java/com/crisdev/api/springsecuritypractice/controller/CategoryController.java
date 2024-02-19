@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class CategoryController {
 //casos de uso
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_ADMIN')")
     public ResponseEntity<Page<Category>> findAll(Pageable pageable) {
 
         Page<Category> categoriesPage = categoryService.findAll(pageable);
@@ -41,6 +43,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_ADMIN')")
     public ResponseEntity<Category> findOneById(@PathVariable Long categoryId) {
 
         Optional<Category> category = categoryService.findOneById(categoryId);
@@ -50,6 +53,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")// Tambien se pueden anotar @Service y @Repository
     public ResponseEntity<Category> createOne(@RequestBody @Valid SaveCategory saveCategory) {
 
         Category category = categoryService.createOne(saveCategory);
@@ -58,6 +62,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_ADMIN')")
     public ResponseEntity<Category> updateOneById(@RequestBody @Valid SaveCategory saveCategory, @PathVariable Long categoryId) {
 
         Category category = categoryService.updateOneByID(categoryId,saveCategory);
@@ -66,6 +71,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}/disabled")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Category> disableOneById(@PathVariable Long categoryId) {
 
         Category category = categoryService.disableOneByID(categoryId);
