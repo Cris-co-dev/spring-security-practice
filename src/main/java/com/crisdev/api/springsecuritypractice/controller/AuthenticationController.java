@@ -1,9 +1,11 @@
 package com.crisdev.api.springsecuritypractice.controller;
 
+import com.crisdev.api.springsecuritypractice.dto.LogoutResponse;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationRequest;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationResponse;
 import com.crisdev.api.springsecuritypractice.persistence.entity.security.User;
 import com.crisdev.api.springsecuritypractice.service.auth.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,5 +43,12 @@ public class AuthenticationController {
         AuthenticationResponse response = authenticationService.login(authenticationRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request){
+        authenticationService.logout(request);
+        return ResponseEntity.ok(new LogoutResponse("Logout exitoso!"));
+    }
+
 
 }
