@@ -2,7 +2,7 @@ package com.crisdev.api.springsecuritypractice.controller;
 
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationRequest;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationResponse;
-import com.crisdev.api.springsecuritypractice.persistence.entity.User;
+import com.crisdev.api.springsecuritypractice.persistence.entity.security.User;
 import com.crisdev.api.springsecuritypractice.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

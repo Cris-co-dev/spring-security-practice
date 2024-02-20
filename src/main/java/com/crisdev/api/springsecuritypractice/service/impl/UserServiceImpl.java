@@ -2,9 +2,11 @@ package com.crisdev.api.springsecuritypractice.service.impl;
 
 import com.crisdev.api.springsecuritypractice.dto.SaveUser;
 import com.crisdev.api.springsecuritypractice.exception.InvalidPasswordException;
-import com.crisdev.api.springsecuritypractice.persistence.entity.User;
-import com.crisdev.api.springsecuritypractice.persistence.repository.UserRepository;
-import com.crisdev.api.springsecuritypractice.persistence.util.Role;
+import com.crisdev.api.springsecuritypractice.exception.ObjectNotFoundException;
+import com.crisdev.api.springsecuritypractice.persistence.entity.security.Role;
+import com.crisdev.api.springsecuritypractice.persistence.entity.security.User;
+import com.crisdev.api.springsecuritypractice.persistence.repository.security.UserRepository;
+import com.crisdev.api.springsecuritypractice.service.RoleService;
 import com.crisdev.api.springsecuritypractice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -32,7 +36,11 @@ public class UserServiceImpl implements UserService {
         user.setUsername(newUser.getUsername());
         user.setName(newUser.getName());
         user.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        user.setRole(Role.CUSTOMER);
+
+        Role defaulRole = roleService.findDefaultRole()
+                .orElseThrow(() -> new ObjectNotFoundException("Role not found. Default role"));
+
+        user.setRole(defaulRole);
 
         return userRepository.save(user);
     }

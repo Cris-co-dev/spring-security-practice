@@ -1,6 +1,5 @@
-package com.crisdev.api.springsecuritypractice.persistence.entity;
+package com.crisdev.api.springsecuritypractice.persistence.entity.security;
 
-import com.crisdev.api.springsecuritypractice.persistence.util.Role;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -22,7 +20,8 @@ public class User implements UserDetails {
     private String username;
     private String name;
     private String password;
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
 
@@ -32,7 +31,7 @@ public class User implements UserDetails {
         if (role == null) return null;
 
         if (role.getPermissions() == null) return null;
-
+/*
         List<SimpleGrantedAuthority> authorities = role.getPermissions().stream()
                 .map(each -> {
                     String permission = each.name();
@@ -42,7 +41,17 @@ public class User implements UserDetails {
 
         // Cuando se autoriza con roles, se añade esta linea de código. porque el método .hasRole llama despues a .hasAuthority y .hasAnyAuthority
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+*/
 
+        List<SimpleGrantedAuthority> authorities = role.getPermissions().stream()
+                .map(each -> {
+                    String permission = each.getOperation().getName();
+                    return new SimpleGrantedAuthority(permission);
+                })
+                .collect(Collectors.toList());
+
+        // Cuando se autoriza con roles, se añade esta linea de código. porque el método .hasRole llama despues a .hasAuthority y .hasAnyAuthority
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.getName()));
         return authorities;
     }
 

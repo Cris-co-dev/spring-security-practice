@@ -5,13 +5,12 @@ import com.crisdev.api.springsecuritypractice.dto.SaveUser;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationRequest;
 import com.crisdev.api.springsecuritypractice.dto.auth.AuthenticationResponse;
 import com.crisdev.api.springsecuritypractice.exception.ObjectNotFoundException;
-import com.crisdev.api.springsecuritypractice.persistence.entity.User;
+import com.crisdev.api.springsecuritypractice.persistence.entity.security.User;
 import com.crisdev.api.springsecuritypractice.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class AuthenticationService {
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setName(user.getName());
-        userDto.setRole(user.getRole().name());
+        userDto.setRole(user.getRole().getName());
 
         //Generar Token
 
@@ -51,7 +50,7 @@ public class AuthenticationService {
     private Map<String, Object> generateExtraClaims(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("name", user.getName());
-        extraClaims.put("role", user.getRole().name());
+        extraClaims.put("role", user.getRole().getName());
         extraClaims.put("authorities", user.getAuthorities());
 
         return extraClaims;
