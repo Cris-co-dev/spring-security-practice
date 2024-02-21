@@ -37,6 +37,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(user);
     }
 
+    //@CrossOrigin
     @PostMapping("/authenticate")
     @PreAuthorize("permitAll()")
     public ResponseEntity<AuthenticationResponse> autenticate(@RequestBody @Valid AuthenticationRequest authenticationRequest){
